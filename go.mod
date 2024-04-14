@@ -1,3 +1,3 @@
-module github.com/g-vinokurov/Pyramidum-BE-service-auth
+module github.com/g-vinokurov/pyramidum-backend-service-auth
 
-go 1.22
+go 1.22.1
