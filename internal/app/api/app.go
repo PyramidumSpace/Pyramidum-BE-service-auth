@@ -1,12 +1,12 @@
-package grpcapp
+package api
 
 import (
 	"context"
 	"fmt"
+	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/api/registry"
+	authgrpc "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/interface/grpc/auth"
 	"log/slog"
 	"net"
-
-	authgrpc "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/grpc/auth"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
@@ -16,9 +16,10 @@ import (
 )
 
 type App struct {
-	log        *slog.Logger
+	logger     *slog.Logger
 	gRPCServer *grpc.Server
 	port       int // gRPC server port
+	registry   *registry.Registry
 }
 
 // InterceptorLogger adapts slog logger to interceptor logger.
@@ -49,12 +50,18 @@ func New(
 		}),
 	}
 
+	authRepo := NewAuthRepo()
+
+	authService := NewAuthService(authRepo)
+
+	r := registry.NewRegistry(authService, storage)
+
 	gRPCServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
 		recovery.UnaryServerInterceptor(recoveryOpts...),
 		logging.UnaryServerInterceptor(InterceptorLogger(log), loggingOpts...),
 	))
 
-	authgrpc.Register(gRPCServer, authService)
+	authgrpc.Register(gRPCServer, r)
 
 	return &App{
 		log:        log,

@@ -4,24 +4,32 @@ import (
 	"flag"
 	"github.com/ilyakaznacheev/cleanenv"
 	"os"
+	"strings"
 	"time"
 )
 
 type Config struct {
-	Env            string     `yaml:"env" env-default:"local"`
-	StoragePath    string     `yaml:"storage_path" env-required:"true"`
-	GRPC           GRPCConfig `yaml:"grpc"`
+	PostgresDSN string
+	GRPC        GRPCConfig
+	/// naming как в Makefile
 	MigrationsPath string
-	AppSecretKey   string        `yaml:"app_secret_key"`
+	AppSecretKey   string
 	TokenTTL       time.Duration `yaml:"token_ttl" env-default:"1h"`
 }
 
 type GRPCConfig struct {
-	Port    int           `yaml:"port"`
-	Timeout time.Duration `yaml:"timeout"`
+	Port int `yaml:"port"`
 }
 
 func MustLoad() *Config {
+	config := &Config{
+		PostgresDSN:    GetEnvString("POSTGRES_DSN"),
+		GRPC:           GRPCConfig{},
+		MigrationsPath: "",
+		AppSecretKey:   "",
+		TokenTTL:       0,
+	}
+
 	configPath := fetchConfigPath()
 	if configPath == "" {
 		panic("config path is empty")
@@ -55,4 +63,13 @@ func fetchConfigPath() string {
 	}
 
 	return res
+}
+
+func GetEnvString(name string, defaultVal string) string {
+	val := os.Getenv(name)
+	if strings.TrimSpace(val) == "" {
+		return defaultVal
+	}
+
+	return val
 }

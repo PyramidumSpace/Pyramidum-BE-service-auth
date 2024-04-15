@@ -5,32 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/domain/models"
+	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/domain/repository"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/lib/jwt"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/lib/logger/sl"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage"
 	"golang.org/x/crypto/bcrypt"
 	"log/slog"
 	"time"
 )
 
-type UserSaver interface {
-	SaveUser(
-		ctx context.Context,
-		email string,
-		passHash []byte,
-	) (uid int64, err error)
-}
-
-type UserProvider interface {
-	User(ctx context.Context, email string) (models.User, error)
-}
-
 type Auth struct {
-	log         *slog.Logger
-	usrSaver    UserSaver
-	usrProvider UserProvider
-	tokenTTL    time.Duration
-	secret      string
+	log      *slog.Logger
+	userRepo repository.UserRepository
+	tokenTTL time.Duration
+	secret   string
 }
 
 func New(
@@ -107,7 +94,7 @@ func (a *Auth) Login(
 
 	user, err := a.usrProvider.User(ctx, email)
 	if err != nil {
-		if errors.Is(err, storage.ErrUserNotFound) {
+		if errors.Is(err, repository.ErrUserNotFound) {
 			a.log.Warn("user not found", sl.Err(err))
 
 			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredentials)
@@ -134,4 +121,20 @@ func (a *Auth) Login(
 	}
 
 	return token, nil
+}
+
+func newToken(user models.User, duration time.Duration, secret string) (string, error) {
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	claims := token.Claims.(jwt.MapClaims)
+	claims["uid"] = user.ID
+	claims["email"] = user.Email
+	claims["exp"] = time.Now().Add(duration).Unix()
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }

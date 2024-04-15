@@ -1,10 +1,10 @@
 package app
 
 import (
+	grpcapp "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/api"
 	"log/slog"
 	"time"
 
-	grpcapp "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/grpc"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/services/auth"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage/postgres"
 )

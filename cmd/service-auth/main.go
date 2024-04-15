@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/config"
+	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/api/config"
+	"github.com/joho/godotenv"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -17,6 +18,11 @@ const (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	fmt.Println("Starting service-auth...")
 	cfg := config.MustLoad()
 

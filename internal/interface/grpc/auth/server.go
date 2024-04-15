@@ -3,8 +3,9 @@ package auth
 import (
 	"context"
 	"errors"
+	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/api/registry"
+	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/domain/repository"
 	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/services/auth"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage"
 	authv1 "github.com/g-vinokurov/pyramidum-protos/gen/go/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -13,20 +14,7 @@ import (
 
 type serverAPI struct {
 	authv1.UnimplementedAuthServer
-	auth Auth
-}
-
-type Auth interface {
-	Login(
-		ctx context.Context,
-		email string,
-		password string,
-	) (token string, err error)
-	RegisterNewUser(
-		ctx context.Context,
-		email string,
-		password string,
-	) (userID int64, err error)
+	r *registry.Registry
 }
 
 func Register(gRPCServer *grpc.Server, auth Auth) {
@@ -45,7 +33,7 @@ func (s *serverAPI) Login(
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
-	token, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword())
+	token, err := s.r.Services.Auth.Login(ctx, in.GetEmail(), in.GetPassword())
 	if err != nil {
 
 		if errors.Is(err, auth.ErrInvalidCredentials) {
@@ -73,7 +61,7 @@ func (s *serverAPI) Register(
 	uid, err := s.auth.RegisterNewUser(ctx, in.GetEmail(), in.GetPassword())
 	if err != nil {
 
-		if errors.Is(err, storage.ErrUserExists) {
+		if errors.Is(err, repository.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, "user already exists")
 		}
 
