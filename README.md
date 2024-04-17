@@ -1,2 +1,2 @@
-# Pyramidum-BE-service-auth
-Microservice for authorisation and users
+# backend-service-auth
+Microservice for authorization and users
