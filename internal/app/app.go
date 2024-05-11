@@ -21,9 +21,6 @@ func New(
 	secret string,
 ) *App {
 	storage, err := postgres.New(storagePath)
-	if err != nil {
-		panic(err)
-	}
 
 	authService := auth.New(log, storage, storage, tokenTTL, secret)
 
