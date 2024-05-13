@@ -3,8 +3,8 @@ package auth
 import (
 	"context"
 	"errors"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/services/auth"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage"
+	"github.com/pyramidum-space/backend-service-auth/internal/services/auth"
+	"github.com/pyramidum-space/backend-service-auth/internal/storage"
 	authv1 "github.com/g-vinokurov/pyramidum-protos/gen/go/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
