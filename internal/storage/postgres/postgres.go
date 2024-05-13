@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/domain/models"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage"
+	"github.com/pyramidum-space/backend-service-auth/internal/domain/models"
+	"github.com/pyramidum-space/backend-service-auth/internal/storage"
 	_ "github.com/lib/pq"
 )
 
