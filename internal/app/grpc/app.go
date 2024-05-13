@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"net"
 
-	authgrpc "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/grpc/auth"
+	authgrpc "github.com/pyramidum-space/backend-service-auth/internal/grpc/auth"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
