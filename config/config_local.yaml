@@ -1,0 +1,5 @@
+env: "local"
+app_secret_key: "vary-long-secret-string"
+storage_path: "postgres://user:pass@host:port/database?sslmode=disable"
+grpc:
+  port: 44044
