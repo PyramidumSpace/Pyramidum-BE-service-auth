@@ -1,7 +1,7 @@
 package jwt
 
 import (
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/domain/models"
+	"github.com/pyramidum-space/backend-service-auth/internal/domain/models"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
