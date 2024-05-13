@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/config"
+	"github.com/pyramidum-space/backend-service-auth/internal/app"
+	"github.com/pyramidum-space/backend-service-auth/internal/config"
 	"log/slog"
 	"os"
 	"os/signal"
