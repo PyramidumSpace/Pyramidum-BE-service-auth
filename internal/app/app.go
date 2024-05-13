@@ -4,9 +4,9 @@ import (
 	"log/slog"
 	"time"
 
-	grpcapp "github.com/g-vinokurov/pyramidum-backend-service-auth/internal/app/grpc"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/services/auth"
-	"github.com/g-vinokurov/pyramidum-backend-service-auth/internal/storage/postgres"
+	grpcapp "github.com/pyramidum-space/backend-service-auth/internal/app/grpc"
+	"github.com/pyramidum-space/backend-service-auth/internal/services/auth"
+	"github.com/pyramidum-space/backend-service-auth/internal/storage/postgres"
 )
 
 type App struct {
