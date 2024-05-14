@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/pyramidum-space/backend-service-auth/internal/app"
 	"github.com/pyramidum-space/backend-service-auth/internal/config"
+	"github.com/pyramidum-space/backend-service-auth/internal/env"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -17,6 +18,8 @@ const (
 )
 
 func main() {
+	env.MustLoadEnv()
+
 	fmt.Println("Starting service-auth...")
 	cfg := config.MustLoad()
 
