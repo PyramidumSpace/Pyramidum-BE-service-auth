@@ -5,6 +5,7 @@ import (
 	"github.com/pyramidum-space/backend-service-auth/internal/app"
 	"github.com/pyramidum-space/backend-service-auth/internal/config"
 	"github.com/pyramidum-space/backend-service-auth/internal/env"
+	"github.com/pyramidum-space/backend-service-auth/internal/lib/logger/sl"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -25,7 +26,11 @@ func main() {
 
 	log := setupLogger(cfg.Env)
 
-	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL, cfg.AppSecretKey)
+	application, err := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL, cfg.AppSecretKey)
+	if err != nil {
+		log.Error("unable to create application", sl.Err(err))
+		os.Exit(1)
+	}
 
 	go func() {
 		application.GRPCServer.MustRun()
