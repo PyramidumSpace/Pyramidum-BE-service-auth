@@ -21,7 +21,7 @@ type Auth interface {
 		ctx context.Context,
 		email string,
 		password string,
-	) (token string, err error)
+	) (userID int64, err error)
 	RegisterNewUser(
 		ctx context.Context,
 		email string,
@@ -45,7 +45,7 @@ func (s *serverAPI) Login(
 		return nil, status.Error(codes.InvalidArgument, "password is required")
 	}
 
-	token, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword())
+	uid, err := s.auth.Login(ctx, in.GetEmail(), in.GetPassword())
 	if err != nil {
 
 		if errors.Is(err, auth.ErrInvalidCredentials) {
@@ -55,7 +55,7 @@ func (s *serverAPI) Login(
 		return nil, status.Error(codes.Internal, "failed to login")
 	}
 
-	return &authv1.LoginResponse{Token: token}, nil
+	return &authv1.LoginResponse{UserID: uid}, nil
 }
 
 func (s *serverAPI) Register(

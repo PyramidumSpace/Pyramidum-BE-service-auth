@@ -3,14 +3,14 @@ module github.com/pyramidum-space/backend-service-auth
 go 1.22.1
 
 require (
-	github.com/pyramidum-space/protos v0.0.0-20240414064940-d49d17218273
+	github.com/pyramidum-space/protos v0.0.2
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	google.golang.org/grpc v1.60.0-dev
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/pyramidum-space/protos v0.0.0-20240414064940-d49d17218273 // indirect
+	github.com/pyramidum-space/protos v0.0.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang-migrate/migrate/v4 v4.16.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

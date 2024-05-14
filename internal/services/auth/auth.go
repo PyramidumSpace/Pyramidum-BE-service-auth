@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/pyramidum-space/backend-service-auth/internal/domain/models"
-	"github.com/pyramidum-space/backend-service-auth/internal/lib/jwt"
 	"github.com/pyramidum-space/backend-service-auth/internal/lib/logger/sl"
 	"github.com/pyramidum-space/backend-service-auth/internal/storage"
 	"golang.org/x/crypto/bcrypt"
@@ -95,7 +94,7 @@ func (a *Auth) Login(
 	ctx context.Context,
 	email string,
 	password string,
-) (string, error) {
+) (int64, error) {
 	const op = "Auth.Login"
 
 	log := a.log.With(
@@ -126,12 +125,5 @@ func (a *Auth) Login(
 
 	log.Info("user logged in successfully")
 
-	token, err := jwt.NewToken(user, a.tokenTTL, a.secret)
-	if err != nil {
-		a.log.Error("failed to generate token", sl.Err(err))
-
-		return "", fmt.Errorf("%s: %w", op, err)
-	}
-
-	return token, nil
+	return user.ID, nil
 }
