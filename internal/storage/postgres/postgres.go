@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/lib/pq"
 	"github.com/pyramidum-space/backend-service-auth/internal/domain/models"
 	"github.com/pyramidum-space/backend-service-auth/internal/storage"
-	_ "github.com/lib/pq"
 )
 
 type Storage struct {
@@ -22,6 +22,11 @@ func New(storagePath string) (*Storage, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
 	return &Storage{db: db}, nil
 }
 
@@ -29,17 +34,9 @@ func New(storagePath string) (*Storage, error) {
 func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte) (int64, error) {
 	const op = "storage.postgres.SaveUser"
 
-	stmt, err := s.db.Prepare("INSERT INTO users(email, pass_hash) VALUES($1, $2)")
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	res, err := stmt.ExecContext(ctx, email, passHash)
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	id, err := res.LastInsertId()
+	var id int64
+	err := s.db.QueryRowContext(ctx, "INSERT INTO users(email, pass_hash) VALUES($1, $2) RETURNING id",
+		email, passHash).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}

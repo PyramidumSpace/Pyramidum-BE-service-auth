@@ -16,15 +16,15 @@ func main() {
 	var forceVersion int
 	var dropBase bool
 
-	flag.StringVar(&postgresUser, "user", "", "postgres user")
-	flag.StringVar(&postgresPass, "password", "", "postgres password")
-	flag.StringVar(&postgresHost, "host", "", "postgres host")
-	flag.StringVar(&postgresPort, "port", "", "postgres port")
-	flag.StringVar(&dbName, "db", "", "postgres database")
+	flag.StringVar(&postgresUser, "user", "service-auth-owner", "postgres user")
+	flag.StringVar(&postgresPass, "password", "service-auth-owner", "postgres password")
+	flag.StringVar(&postgresHost, "host", "localhost", "postgres host")
+	flag.StringVar(&postgresPort, "port", "5434", "postgres port")
+	flag.StringVar(&dbName, "db", "service-auth", "postgres database")
 	flag.IntVar(&forceVersion, "force", 0, "postgres database")
 	flag.BoolVar(&dropBase, "drop", false, "postgres database")
 
-	flag.StringVar(&migrationsPath, "migrations-path", "", "path to migrations")
+	flag.StringVar(&migrationsPath, "migrations-path", "./migrations", "path to migrations")
 	flag.StringVar(&migrationsTable, "migrations-table", "migrations", "name of migrations table")
 	flag.Parse()
 

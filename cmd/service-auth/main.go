@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/pyramidum-space/backend-service-auth/internal/app"
 	"github.com/pyramidum-space/backend-service-auth/internal/config"
+	"github.com/pyramidum-space/backend-service-auth/internal/env"
+	"github.com/pyramidum-space/backend-service-auth/internal/lib/logger/sl"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -17,12 +19,18 @@ const (
 )
 
 func main() {
+	env.MustLoadEnv()
+
 	fmt.Println("Starting service-auth...")
 	cfg := config.MustLoad()
 
 	log := setupLogger(cfg.Env)
 
-	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL, cfg.AppSecretKey)
+	application, err := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL, cfg.AppSecretKey)
+	if err != nil {
+		log.Error("unable to create application", sl.Err(err))
+		os.Exit(1)
+	}
 
 	go func() {
 		application.GRPCServer.MustRun()
