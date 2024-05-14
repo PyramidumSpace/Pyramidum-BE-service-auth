@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log/slog"
 	"time"
 
@@ -19,14 +20,16 @@ func New(
 	storagePath string,
 	tokenTTL time.Duration,
 	secret string,
-) *App {
+) (*App, error) {
+	const op = "app.New"
 	storage, err := postgres.New(storagePath)
-
-	_ = err
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
 
 	authService := auth.New(log, storage, storage, tokenTTL, secret)
 
 	grpcApp := grpcapp.New(log, authService, grpcPort)
 
-	return &App{GRPCServer: grpcApp}
+	return &App{GRPCServer: grpcApp}, nil
 }
