@@ -5,14 +5,14 @@ import (
 	"errors"
 	"github.com/pyramidum-space/backend-service-auth/internal/services/auth"
 	"github.com/pyramidum-space/backend-service-auth/internal/storage"
-	authv1 "github.com/g-vinokurov/pyramidum-protos/gen/go/auth"
+	proto "github.com/pyramidum-space/protos/gen/go/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type serverAPI struct {
-	authv1.UnimplementedAuthServer
+	proto.UnimplementedAuthServer
 	auth Auth
 }
 
@@ -30,13 +30,13 @@ type Auth interface {
 }
 
 func Register(gRPCServer *grpc.Server, auth Auth) {
-	authv1.RegisterAuthServer(gRPCServer, &serverAPI{auth: auth})
+	proto.RegisterAuthServer(gRPCServer, &serverAPI{auth: auth})
 }
 
 func (s *serverAPI) Login(
 	ctx context.Context,
-	in *authv1.LoginRequest,
-) (*authv1.LoginResponse, error) {
+	in *proto.LoginRequest,
+) (*proto.LoginResponse, error) {
 	if in.Email == "" {
 		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
@@ -55,13 +55,13 @@ func (s *serverAPI) Login(
 		return nil, status.Error(codes.Internal, "failed to login")
 	}
 
-	return &authv1.LoginResponse{UserID: uid}, nil
+	return &proto.LoginResponse{UserId: uid}, nil
 }
 
 func (s *serverAPI) Register(
 	ctx context.Context,
-	in *authv1.RegisterRequest,
-) (*authv1.RegisterResponse, error) {
+	in *proto.RegisterRequest,
+) (*proto.RegisterResponse, error) {
 	if in.Email == "" {
 		return nil, status.Error(codes.InvalidArgument, "email is required")
 	}
@@ -80,5 +80,5 @@ func (s *serverAPI) Register(
 		return nil, status.Error(codes.Internal, "failed to register user")
 	}
 
-	return &authv1.RegisterResponse{UserId: uid}, nil
+	return &proto.RegisterResponse{UserId: uid}, nil
 }
