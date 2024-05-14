@@ -22,6 +22,8 @@ func New(
 ) *App {
 	storage, err := postgres.New(storagePath)
 
+	_ = err
+
 	authService := auth.New(log, storage, storage, tokenTTL, secret)
 
 	grpcApp := grpcapp.New(log, authService, grpcPort)
