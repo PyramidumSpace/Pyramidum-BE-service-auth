@@ -7,6 +7,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.16.2
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0
 	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/pyramidum-space/protos v0.0.5
 	golang.org/x/crypto v0.22.0
@@ -17,7 +18,6 @@ require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect

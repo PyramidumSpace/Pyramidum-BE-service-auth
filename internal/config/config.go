@@ -1,57 +1,46 @@
 package config
 
 import (
-	"flag"
-	"github.com/ilyakaznacheev/cleanenv"
 	"os"
 	"time"
+        "strconv"
 )
 
 type Config struct {
-	Env            string     `yaml:"env" env-default:"local"`
-	StoragePath    string     `yaml:"storage_path" env-required:"true"`
-	GRPC           GRPCConfig `yaml:"grpc"`
+	Env            string
+	StoragePath    string
+	GRPC           GRPCConfig
 	MigrationsPath string
-	AppSecretKey   string        `yaml:"app_secret_key"`
-	TokenTTL       time.Duration `yaml:"token_ttl" env-default:"1h"`
+	AppSecretKey   string
+	TokenTTL       time.Duration
 }
 
 type GRPCConfig struct {
-	Port    int           `yaml:"port"`
+	Port    int
 }
 
 func MustLoad() *Config {
-	configPath := fetchConfigPath()
-	if configPath == "" {
-		panic("config path is empty")
-	}
-
-	// check if file exists
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		panic("config file does not exist: " + configPath)
-	}
-
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		panic("config path is empty: " + err.Error())
-	}
+        cfg.Env = os.Getenv("ENV")
+        cfg.StoragePath = os.Getenv("STORAGE_PATH")
+        
+        var grpcCfg GRPCConfig
+        port, err := strconv.Atoi(os.Getenv("GRPC_PORT"))
+        if err != nil {
+            panic(err)
+        }
 
-	return &cfg
-}
+        grpcCfg.Port = port
+        
+        cfg.GRPC = grpcCfg
+        cfg.MigrationsPath = os.Getenv("MIGRATIONS_PATH")
+        cfg.AppSecretKey = os.Getenv("APP_SECRET_KEY")
 
-// fetchConfigPath fetches config path from command line flag or environment variable.
-// Priority: flag > env > default.
-// Default value is empty string.
-func fetchConfigPath() string {
-	var res string
-
-	flag.StringVar(&res, "config", "", "path to config file")
-	flag.Parse()
-
-	if res == "" {
-		res = os.Getenv("CONFIG_PATH")
-	}
-
-	return res
+        token_ttl, err := time.ParseDuration(os.Getenv("TOKEN_TTL"))
+        if err != nil {
+            panic(err)
+        }
+        cfg.TokenTTL = token_ttl
+        return &cfg
 }
