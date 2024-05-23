@@ -1,57 +1,49 @@
 package config
 
 import (
-	"flag"
-	"github.com/ilyakaznacheev/cleanenv"
-	"os"
+        "fmt"
 	"time"
+        "github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Env            string     `yaml:"env" env-default:"local"`
-	StoragePath    string     `yaml:"storage_path" env-required:"true"`
-	GRPC           GRPCConfig `yaml:"grpc"`
-	MigrationsPath string
-	AppSecretKey   string        `yaml:"app_secret_key"`
-	TokenTTL       time.Duration `yaml:"token_ttl" env-default:"1h"`
+	Env            string 		`env:"ENV" 		env-default:"local"`
+	GRPC           GRPCConfig
+        Storage        StorageConfig
+	StoragePath    string
+	MigrationsPath string 		`env:"MIGRATIONS_PATH" 	env-default:"./migrations"`
+	AppSecretKey   string 		`env:"APP_SECRET_KEY" 	env-default:"very-secret-key"`
+	TokenTTL       time.Duration 	`env:"TOKEN_TTL" 	env-default:"1h"`
+}
+
+type StorageConfig struct {
+       Dialect	string `env:"DB_DIALECT" 	env-default:"postgres"`
+       User     string `env:"DB_USER" 		env-required:"true"`
+       Password string `env:"DB_PASSWORD" 	env-required:"true"`
+       Host     string `env:"DB_HOST" 		env-required:"true"`
+       Port     string `env:"DB_PORT" 		env-default:"5432"`
+       Database string `env:"DB_DATABASE" 	env-required:"true"`
+       SSLMode  string `env:"DB_SSL" 		env-default:"disable"`
 }
 
 type GRPCConfig struct {
-	Port    int           `yaml:"port"`
+	Port    int `env:"GRPC_PORT" env-required:"true"`
 }
 
 func MustLoad() *Config {
-	configPath := fetchConfigPath()
-	if configPath == "" {
-		panic("config path is empty")
-	}
-
-	// check if file exists
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		panic("config file does not exist: " + configPath)
-	}
-
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		panic("config path is empty: " + err.Error())
-	}
+        cleanenv.ReadEnv(&cfg)
 
-	return &cfg
-}
-
-// fetchConfigPath fetches config path from command line flag or environment variable.
-// Priority: flag > env > default.
-// Default value is empty string.
-func fetchConfigPath() string {
-	var res string
-
-	flag.StringVar(&res, "config", "", "path to config file")
-	flag.Parse()
-
-	if res == "" {
-		res = os.Getenv("CONFIG_PATH")
-	}
-
-	return res
+        cfg.StoragePath = fmt.Sprintf(
+		"%s://%s:%s@%s:%s/%s?sslmode=%s",
+		cfg.Storage.Dialect,
+		cfg.Storage.User,
+		cfg.Storage.Password,
+		cfg.Storage.Host,
+		cfg.Storage.Port,
+		cfg.Storage.Database,
+		cfg.Storage.SSLMode,               
+	)
+        return &cfg
 }
