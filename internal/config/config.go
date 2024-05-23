@@ -1,46 +1,49 @@
 package config
 
 import (
-	"os"
+        "fmt"
 	"time"
-        "strconv"
+        "github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	Env            string
-	StoragePath    string
+	Env            string 		`env:"ENV" 		env-default:"local"`
 	GRPC           GRPCConfig
-	MigrationsPath string
-	AppSecretKey   string
-	TokenTTL       time.Duration
+        Storage        StorageConfig
+	StoragePath    string
+	MigrationsPath string 		`env:"MIGRATIONS_PATH" 	env-default:"./migrations"`
+	AppSecretKey   string 		`env:"APP_SECRET_KEY" 	env-default:"very-secret-key"`
+	TokenTTL       time.Duration 	`env:"TOKEN_TTL" 	env-default:"1h"`
+}
+
+type StorageConfig struct {
+       Dialect	string `env:"DB_DIALECT" 	env-default:"postgres"`
+       User     string `env:"DB_USER" 		env-required:"true"`
+       Password string `env:"DB_PASSWORD" 	env-required:"true"`
+       Host     string `env:"DB_HOST" 		env-required:"true"`
+       Port     string `env:"DB_PORT" 		env-default:"5432"`
+       Database string `env:"DB_DATABASE" 	env-required:"true"`
+       SSLMode  string `env:"DB_SSL" 		env-default:"disable"`
 }
 
 type GRPCConfig struct {
-	Port    int
+	Port    int `env:"GRPC_PORT" env-required:"true"`
 }
 
 func MustLoad() *Config {
 	var cfg Config
 
-        cfg.Env = os.Getenv("ENV")
-        cfg.StoragePath = os.Getenv("STORAGE_PATH")
-        
-        var grpcCfg GRPCConfig
-        port, err := strconv.Atoi(os.Getenv("GRPC_PORT"))
-        if err != nil {
-            panic(err)
-        }
+        cleanenv.ReadEnv(&cfg)
 
-        grpcCfg.Port = port
-        
-        cfg.GRPC = grpcCfg
-        cfg.MigrationsPath = os.Getenv("MIGRATIONS_PATH")
-        cfg.AppSecretKey = os.Getenv("APP_SECRET_KEY")
-
-        token_ttl, err := time.ParseDuration(os.Getenv("TOKEN_TTL"))
-        if err != nil {
-            panic(err)
-        }
-        cfg.TokenTTL = token_ttl
+        cfg.StoragePath = fmt.Sprintf(
+		"%s://%s:%s@%s:%s/%s?sslmode=%s",
+		cfg.Storage.Dialect,
+		cfg.Storage.User,
+		cfg.Storage.Password,
+		cfg.Storage.Host,
+		cfg.Storage.Port,
+		cfg.Storage.Database,
+		cfg.Storage.SSLMode,               
+	)
         return &cfg
 }
